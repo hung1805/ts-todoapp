@@ -2,7 +2,8 @@ export interface ITodo {
   id: number;
   title: string;
   isCompleted: boolean;
-  timeLine: number;
+  dayCreated: number;
+  dueDate: number;
 }
 export type AddTodo = (newTodo: ITodo) => void;
 export type RemoveTodo = (id: number) => void;

@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { todoList } from '../../todoList';
-import { AddTodo, RemoveTodo, ToggleTodo, UpdateTodo } from '../../type';
-import TodoFilter from '../TodoFilter';
+import { AddTodo, ITodo, RemoveTodo, ToggleTodo, UpdateTodo } from '../../type';
 import TodoForm from '../TodoForm';
 import TodoItem from '../TodoItem';
+import { ListGroup } from 'react-bootstrap';
 
 const TodoList: React.FC = () => {
   const [list, setList] = useState(todoList);
+  const [sortOption, setSortOption] = useState('');
+  const [filterOption, setFilterOption] = useState('');
   const add: AddTodo = (newTodo) => {
     setList([...list, newTodo]);
   };
@@ -34,17 +36,29 @@ const TodoList: React.FC = () => {
       })
     );
   };
+
   return (
     <div>
       <TodoForm addTodo={add} />
-      <TodoFilter />
-      <ul>
-        {list.map((item) => (
-          <li key={item.id}>
-            <TodoItem todo={item} updateTodo={update} removeTodo={remove} toggleTodo={toggle} />
-          </li>
-        ))}
-      </ul>
+
+      {list.length > 0 ? (
+        <ListGroup className='my-4'>
+          {list.map((item) => (
+            <ListGroup.Item key={item.id}>
+              <TodoItem
+                todo={item}
+                updateTodo={update}
+                removeTodo={remove}
+                toggleTodo={toggle}
+                setList={setList}
+                list={list}
+              />
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+      ) : (
+        <p className='pt-4 text-center'>You have no todo.</p>
+      )}
     </div>
   );
 };
