@@ -4,12 +4,12 @@ import { todoList } from '../../todoList';
 import { AddTodo, ITodo, RemoveTodo, ToggleTodo, UpdateTodo } from '../../type';
 import TodoForm from '../TodoForm';
 import TodoItem from '../TodoItem';
-import { ListGroup } from 'react-bootstrap';
+import { Alert, ListGroup } from 'react-bootstrap';
 
 const TodoList: React.FC = () => {
   const [list, setList] = useState(todoList);
-  const [sortOption, setSortOption] = useState('');
-  const [filterOption, setFilterOption] = useState('');
+  const [error, setError] = useState<string>('');
+  const [showError, setShowError] = useState(false);
   const add: AddTodo = (newTodo) => {
     setList([...list, newTodo]);
   };
@@ -39,7 +39,12 @@ const TodoList: React.FC = () => {
 
   return (
     <div>
-      <TodoForm addTodo={add} />
+      <TodoForm addTodo={add} setError={setError} setShowError={setShowError} />
+      {showError && error && (
+        <Alert variant='danger' dismissible onClose={() => setShowError(false)}>
+          {error}
+        </Alert>
+      )}
 
       {list.length > 0 ? (
         <ListGroup className='my-4'>

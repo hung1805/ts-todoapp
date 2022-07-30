@@ -1,38 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Button, InputGroup } from 'react-bootstrap';
 import { DayPicker } from 'react-day-picker';
 import Form from 'react-bootstrap/Form';
 import { AddTodo } from '../../type';
 import 'react-day-picker/dist/style.css';
-import { formatTime } from '../../utilities';
+import { formatTime, validateDay } from '../../utilities';
 
 interface TodoFormProps {
   addTodo: AddTodo;
+  setError: Dispatch<SetStateAction<string>>;
+  setShowError: Dispatch<SetStateAction<boolean>>;
 }
 
-const TodoForm: React.FC<TodoFormProps> = ({ addTodo }) => {
+const TodoForm: React.FC<TodoFormProps> = ({ addTodo, setError, setShowError }) => {
   const [showDayPicker, setShowDayPicker] = useState<boolean>(false);
   const [task, setTask] = useState<string>('');
   const [selected, setSelected] = React.useState<Date | undefined>(undefined);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setTask(e.target.value);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!task || /^\s*$/.test(task)) return;
-    else {
+    if (!task || /^\s*$/.test(task)) {
+      setError('Please Enter Your Task');
+      setShowError(true);
+    } else {
       if (selected) {
-        addTodo({
-          id: Date.now(),
-          title: task,
-          isCompleted: false,
-          dayCreated: Date.now(),
-          dueDate: selected.getTime(),
-        });
-        setTask('');
-        setShowDayPicker(false);
-      } else alert('Pick a Due Day');
+        const time = new Date(selected).getTime();
+        console.log(time < Date.now());
+        if (time < Date.now()) {
+          setError('Time is over. Please pick another day.');
+          setShowError(true);
+        } else {
+          addTodo({
+            id: Date.now(),
+            title: task,
+            isCompleted: false,
+            dayCreated: Date.now(),
+            dueDate: selected.getTime(),
+          });
+          setTask('');
+          setShowDayPicker(false);
+          setSelected(undefined);
+        }
+      } else {
+        setError('Pick a Due Day');
+        setShowError(true);
+      }
     }
   };
   useEffect(() => {
+    setShowError(false);
     setShowDayPicker(false);
   }, [selected]);
   return (
